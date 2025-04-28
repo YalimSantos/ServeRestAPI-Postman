@@ -1,0 +1,539 @@
+{
+	"info": {
+		"_postman_id": "16e0860c-46d6-4694-949b-3adee999dcc9",
+		"name": "ServeRest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21112927"
+	},
+	"item": [
+		{
+			"name": "Usuários",
+			"item": [
+				{
+					"name": "Criar usuário",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"  pm.response.to.have.status(201);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Schema is valid\", function () {\r",
+									"  const Ajv = require(\"ajv\");\r",
+									"  const ajv = new Ajv({allErrors: true, verbose: true})\r",
+									"\r",
+									"  pm.expect(ajv.validate(pm.globals.get(\"schema\"), pm.response.json()), JSON.stringify(ajv.errors)).to.be.true;\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Message is valid\", function() {\r",
+									"  pm.expect(pm.response.json().message).to.be.eql(\"Cadastro realizado com sucesso\")\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Save Id\", function() {\r",
+									"  pm.globals.set(\"usuarioId\", pm.response.json()._id);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.globals.set(\"schema\", {\r",
+									"  \"type\": \"object\",\r",
+									"  \"properties\": {\r",
+									"    \"message\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"_id\": {\r",
+									"      \"type\": \"string\"\r",
+									"    }\r",
+									"  },\r",
+									"  \"required\": [\r",
+									"    \"message\",\r",
+									"    \"_id\"\r",
+									"  ]\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"{{$randomFullName}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"teste\",\n  \"administrador\": \"false\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/usuarios",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"usuarios"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Receber um usuário",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Schema is valid\", function () {\r",
+									"  const Ajv = require(\"ajv\");\r",
+									"  const ajv = new Ajv({allErrors: true, verbose: true})\r",
+									"\r",
+									"  pm.expect(ajv.validate(pm.globals.get(\"schema\"), pm.response.json()), JSON.stringify(ajv.errors)).to.be.true;\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Id is valid\", function() {\r",
+									"  pm.expect(pm.response.json()._id).to.be.eql(pm.globals.get(\"usuarioId\"))\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Save user\", function() {\r",
+									"  pm.globals.set(\"usuarioEmail\", pm.response.json().email);\r",
+									"  pm.globals.set(\"usuarioName\", pm.response.json().nome);\r",
+									"  pm.globals.set(\"usuarioPassword\", pm.response.json().password);\r",
+									"})\r",
+									"\r",
+									"pm.execution.setNextRequest('Realizar login')"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.globals.set(\"schema\", {\r",
+									"  \"type\": \"object\",\r",
+									"  \"properties\": {\r",
+									"    \"nome\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"email\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"password\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"administrador\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"_id\": {\r",
+									"      \"type\": \"string\"\r",
+									"    }\r",
+									"  },\r",
+									"  \"required\": [\r",
+									"    \"nome\",\r",
+									"    \"email\",\r",
+									"    \"password\",\r",
+									"    \"administrador\",\r",
+									"    \"_id\"\r",
+									"  ]\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/usuarios/{{usuarioId}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"usuarios",
+								"{{usuarioId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Alterar usuário",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Schema is valid\", function () {\r",
+									"  const Ajv = require(\"ajv\");\r",
+									"  const ajv = new Ajv({allErrors: true, verbose: true})\r",
+									"\r",
+									"  pm.expect(ajv.validate(pm.globals.get(\"schema\"), pm.response.json()), JSON.stringify(ajv.errors)).to.be.true;\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Message is valid\", function() {\r",
+									"  pm.expect(pm.response.json().message).to.be.eql(\"Registro alterado com sucesso\")\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Save Id (if have)\", function() {\r",
+									"  if(pm.response.json()._id){\r",
+									"    pm.globals.set(\"usuarioId\", pm.response.json()._id);\r",
+									"  }\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Save new email\", function() {\r",
+									"  pm.globals.set(\"usuarioEmail\", pm.response.json().email);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.globals.set(\"schema\", {\r",
+									"  \"type\": \"object\",\r",
+									"  \"properties\": {\r",
+									"    \"message\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"  },\r",
+									"  \"required\": [\r",
+									"    \"message\",\r",
+									"  ]\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"{{usuarioName}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"teste\",\n  \"administrador\": \"false\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/usuarios/{{usuarioId}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"usuarios",
+								"{{usuarioId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Recebe um usuário atualizado",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Schema is valid\", function () {\r",
+									"  const Ajv = require(\"ajv\");\r",
+									"  const ajv = new Ajv({allErrors: true, verbose: true})\r",
+									"\r",
+									"  pm.expect(ajv.validate(pm.globals.get(\"schema\"), pm.response.json()), JSON.stringify(ajv.errors)).to.be.true;\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Validate different email\", function() {\r",
+									"  pm.expect(pm.response.json().email).to.not.be.eql(pm.globals.get(\"usuarioEmail\"))\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Id is valid\", function() {\r",
+									"  pm.expect(pm.response.json()._id).to.be.eql(pm.globals.get(\"usuarioId\"))\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Save user\", function() {\r",
+									"  pm.globals.set(\"usuarioEmail\", pm.response.json().email);\r",
+									"  pm.globals.set(\"usuarioName\", pm.response.json().nome);\r",
+									"  pm.globals.set(\"usuarioPassword\", pm.response.json().password);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.globals.set(\"schema\", {\r",
+									"  \"type\": \"object\",\r",
+									"  \"properties\": {\r",
+									"    \"nome\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"email\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"password\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"administrador\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"_id\": {\r",
+									"      \"type\": \"string\"\r",
+									"    }\r",
+									"  },\r",
+									"  \"required\": [\r",
+									"    \"nome\",\r",
+									"    \"email\",\r",
+									"    \"password\",\r",
+									"    \"administrador\",\r",
+									"    \"_id\"\r",
+									"  ]\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/usuarios/{{usuarioId}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"usuarios",
+								"{{usuarioId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deletar um usuário",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"\r",
+									"  pm.globals.unset(\"usuarioId\")\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Schema is valid\", function () {\r",
+									"  const Ajv = require(\"ajv\");\r",
+									"  const ajv = new Ajv({allErrors: true, verbose: true})\r",
+									"\r",
+									"  pm.expect(ajv.validate(pm.globals.get(\"schema\"), pm.response.json()), JSON.stringify(ajv.errors)).to.be.true;\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Message is valid\", function() {\r",
+									"  pm.expect(pm.response.json().message).to.be.eql(\"Registro excluído com sucesso\")\r",
+									"})\r",
+									"\r",
+									"pm.execution.setNextRequest(null)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.globals.set(\"schema\", {\r",
+									"  \"type\": \"object\",\r",
+									"  \"properties\": {\r",
+									"    \"message\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"  },\r",
+									"  \"required\": [\r",
+									"    \"message\",\r",
+									"  ]\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/usuarios/{{usuarioId}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"usuarios",
+								"{{usuarioId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Login",
+			"item": [
+				{
+					"name": "Realizar login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"})\r",
+									"\r",
+									"pm.execution.setNextRequest(\"Alterar usuário\")"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"{{usuarioEmail}}\",\r\n  \"password\": \"{{usuarioPassword}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/login",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

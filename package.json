@@ -1,0 +1,15 @@
+{
+  "name": "postman-serverest",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Yalim Santos",
+  "license": "MIT",
+  "scripts": {
+    "run:collection": "rimraf reports/ && newman run ServeRest.postman_collection.json -e Serverest_test.postman_environment.json -r cli,htmlextra --reporter-htmlextra-export ./reports/report.html"
+  },
+  "dependencies": {
+    "newman": "^6.2.1",
+    "newman-reporter-htmlextra": "^1.23.1",
+    "rimraf": "^6.0.1"
+  }
+}
